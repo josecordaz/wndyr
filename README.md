@@ -1,6 +1,7 @@
 # Overview
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d32d8df3c31d43969c6aa8876af40e22)](https://app.codacy.com/gh/josecordaz/wndyr?utm_source=github.com&utm_medium=referral&utm_content=josecordaz/wndyr&utm_campaign=Badge_Grade)
+[![Coverage](http://3.88.72.236/api/project_badges/measure?project=roverapi&metric=coverage)](http://3.88.72.236/dashboard?id=roverapi)
 
 Download images gathered by NASA's Curiosity, Opportunity, and Spirit rovers on Mars for specific date.
 
