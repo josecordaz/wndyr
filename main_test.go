@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -44,71 +46,72 @@ func TestMakeDir(t *testing.T) {
 
 func TestGetDateImagesURL(t *testing.T) {
 
-	// assert := assert.New(t)
+	assert := assert.New(t)
 
-	// fileURL := "https://foo.com/image.jpg"
-	// photo := Photo{
-	// 	ImgSrc: fileURL,
-	// }
-	// d := Data{
-	// 	Photos: []*Photo{&photo},
-	// }
+	myAPIKey := "myapikey"
+	fileURL := "https://foo.com/image.jpg"
+	photo := Photo{
+		ImgSrc: fileURL,
+	}
+	d := Data{
+		Photos: []*Photo{&photo},
+	}
 
-	// server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		page := req.URL.Query().Get("page")
+		fmt.Println("page", page)
+		if page == "1" {
+			bts, _ := json.Marshal(d)
+			rw.Header().Set("Content-Type", "application/json")
+			rw.Write(bts)
+		} else {
+			assert.Equal("2", page)
+			rw.Header().Set("Content-Type", "application/json")
+			rw.Write([]byte("{}"))
+		}
 
-	// 	page := req.URL.Query().Get("page")
-	// 	fmt.Println("page", page)
-	// 	if page == "1" {
-	// 		bts, _ := json.Marshal(d)
-	// 		rw.Header().Set("Content-Type", "application/json")
-	// 		rw.Write(bts)
-	// 	} else {
-	// 		assert.Equal("2", page)
-	// 		rw.Header().Set("Content-Type", "application/json")
-	// 		rw.Write([]byte("{}"))
-	// 	}
+	}))
+	defer server.Close()
 
-	// }))
-	// defer server.Close()
+	images := make(chan string, 1)
 
-	// images := make(chan string, 1)
+	count, err := getDateImagesURL("2020-8-6", myAPIKey, server.URL, images)
+	assert.NoError(err)
+	assert.Equal(1, count)
 
-	// err := getDateImagesURL("2020-8-6", server.URL, images)
-	// assert.NoError(err)
-
-	// img := <-images
-	// assert.Equal(fileURL, img)
+	img := <-images
+	assert.Equal(fileURL, img)
 
 }
 
 func TestDownloadImages(t *testing.T) {
 
-	// assert := assert.New(t)
+	assert := assert.New(t)
 
-	// date := "2020-8-3"
+	date := "2020-8-3"
 
-	// server := httptest.NewServer(http.FileServer(http.Dir("/test_data")))
-	// defer server.Close()
+	server := httptest.NewServer(http.FileServer(http.Dir("/test_data")))
+	defer server.Close()
 
-	// tempDir := t.TempDir()
+	tempDir := t.TempDir()
 
-	// err := makeDir(tempDir + "/" + date)
-	// assert.NoError(err)
+	path, err := makeDir(tempDir, date)
+	assert.NoError(err)
 
-	// images := make(chan string, 1)
-	// images <- server.URL + "/image.jpg"
-	// close(images)
+	images := make(chan string, 1)
+	images <- server.URL + "/image.jpg"
+	close(images)
 
-	// done := make(chan error, 1)
+	done := make(chan error, 1)
 
-	// http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	// downloadImages(tempDir+"/"+date, images, done)
-	// e := <-done
-	// assert.Equal("", e.Error())
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	downloadImages(path, images, done)
+	e := <-done
+	assert.Equal("", e.Error())
 
-	// assert.FileExists(tempDir + "/" + date + "/" + "image.jpg")
+	assert.FileExists(tempDir + "/" + date + "/" + "image.jpg")
 
-	// os.Remove(tempDir)
+	os.Remove(tempDir)
 
 }
 
