@@ -1,5 +1,7 @@
 # Overview
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d32d8df3c31d43969c6aa8876af40e22)](https://app.codacy.com/gh/josecordaz/wndyr?utm_source=github.com&utm_medium=referral&utm_content=josecordaz/wndyr&utm_campaign=Badge_Grade)
+
 Download images gathered by NASA's Curiosity, Opportunity, and Spirit rovers on Mars for specific date.
 
 ## Build executable binary
