@@ -24,5 +24,9 @@ nasa.exe YYYY-M-D
 ## Example
 ### Download images from 2020-Aug-6
 ```shell
-nasa 2020-8-6
+./nasa 2020-8-6
+```
+### Download images from 2020-Aug-6 on windows
+```shell
+nasa.exe 2020-8-6
 ```
